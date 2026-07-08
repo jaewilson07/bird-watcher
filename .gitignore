@@ -1,43 +1,15 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-dist/
-*.egg-info/
-.pytest_cache/
-.ruff_cache/
-
-/data/snapshots
+.env
 /data/tests
 
-# Virtual environments
-.venv/
-venv/
-env/
 
-# Data (snapshots, db, etc)
-data/snapshots/*.jpg
-data/snapshots/*.png
-data/birds.db
-data/*.db
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-
-# Notebook checkpoints
-.ipynb_checkpoints/
-
-# Env
-.env
-.env.local
-
-# Build artifacts
-docs/diagrams/*.svg
+/.quarto/
+**/*.quarto_ipynb
+/tutorials/.quarto/
+/tutorials/_docs/
+/tutorials/site_libs/
+/tutorials/*.html.md
+/tutorials/_quarto.yml
+/tutorials/nbdev.yml
+/tutorials/sidebar.yml
+/tutorials/_ignore/
+/config.yaml

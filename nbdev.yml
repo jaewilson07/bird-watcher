@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "bird-watcher"
+  site-url: "/"
+  description: "Smart bird detection system — tutorial in 10 issues"
+  repo-branch: main
+  repo-url: ""

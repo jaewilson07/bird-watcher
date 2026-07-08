@@ -1,0 +1,62 @@
+[
+  {
+    "objectID": "01-setup.html",
+    "href": "01-setup.html",
+    "title": "Step 1: Setup",
+    "section": "",
+    "text": "Exported source\nfrom pathlib import Path\nfrom dotenv import load_dotenv\nimport os\nimport yaml",
+    "crumbs": [
+      "Step 1: Setup"
+    ]
+  },
+  {
+    "objectID": "01-setup.html#step-1.1-check-python",
+    "href": "01-setup.html#step-1.1-check-python",
+    "title": "Step 1: Setup",
+    "section": "Step 1.1 — Check Python",
+    "text": "Step 1.1 — Check Python\nWe need Python 3.10 or newer.\n\nimport sys\n\nprint(\"Python version:\", sys.version)\nassert sys.version_info &gt;= (3, 10), \"Need Python 3.10+\"\n\nPython version: 3.11.15 (main, Jun  2 2026, 22:26:03) [Clang 22.1.3 ]",
+    "crumbs": [
+      "Step 1: Setup"
+    ]
+  },
+  {
+    "objectID": "01-setup.html#step-1.2-say-hello-to-bird-watcher",
+    "href": "01-setup.html#step-1.2-say-hello-to-bird-watcher",
+    "title": "Step 1: Setup",
+    "section": "Step 1.2 — Say hello to bird-watcher",
+    "text": "Step 1.2 — Say hello to bird-watcher\nImport the package and print its version.\n\nimport bird_watcher\nprint(\"bird-watcher version:\", bird_watcher.__version__)\n\nbird-watcher version: 0.0.0",
+    "crumbs": [
+      "Step 1: Setup"
+    ]
+  },
+  {
+    "objectID": "01-setup.html#step-1.3-load-config.yaml",
+    "href": "01-setup.html#step-1.3-load-config.yaml",
+    "title": "Step 1: Setup",
+    "section": "Step 1.3 — Load config.yaml",
+    "text": "Step 1.3 — Load config.yaml\nWe use config.yaml for local settings like the Slack webhook, your phone’s IP, and the Hugging Face token. The shared setup cell reads that file once so every notebook gets the same values.\n\n\nload_environment\ndef load_environment(\n    env_path:str='../.env', debug_prn:bool=False\n):\nLoad environment variables from a .env file.\n\n\n\nload_config\ndef load_config(\n    config_path:str='../config.yaml', debug_prn:bool=False\n):\nLoad configuration from a YAML file.\n\nload_config(debug_prn=True)\nload_environment( debug_prn=True)\n\nloading config ../config.yaml\nloading environment variables from ../.env\n\n\n1\n\n\n\nR\n\n# From config.yaml (or hardcoded fallback)\nSLACK_WEBHOOK = str(CONFIG.get(\"slack_webhook\", \"\"))\nHUGGINGFACE_API_KEY = str(CONFIG.get(\"huggingface_api_key\", \"\"))\n\nSNAPSHOT_FOLDER.mkdir(parents=True, exist_ok=True)\nCROP_FOLDER.mkdir(parents=True, exist_ok=True)\nprint(f\"Snapshot folder: {SNAPSHOT_FOLDER}\")\nprint(f\"Config file: {CONFIG_FILE}\")\nprint(f\"Phone URL: {PHONE_URL}\")\n\nConfig file not found at /home/jaewilson07/GitHub/bird-watcher/config.yaml; using defaults.\nSnapshot folder: /home/jaewilson07/GitHub/bird-watcher/data/snapshots\nConfig file: /home/jaewilson07/GitHub/bird-watcher/config.yaml\nPhone URL: http://192.168.1.42:8080/photo.jpg",
+    "crumbs": [
+      "Step 1: Setup"
+    ]
+  },
+  {
+    "objectID": "01-setup.html#acceptance-criterion",
+    "href": "01-setup.html#acceptance-criterion",
+    "title": "Step 1: Setup",
+    "section": "Acceptance criterion",
+    "text": "Acceptance criterion\nThe three print lines below should show real values (not errors).\n\nassert SNAPSHOT_FOLDER.exists(), f\"{SNAPSHOT_FOLDER} should exist after the setup cell\"\nassert isinstance(PHONE_IP, str) and PHONE_IP, \"PHONE_IP should be a non-empty string\"\nassert PHONE_URL.startswith(\"http\"), \"PHONE_URL should look like http://...\"\nprint(\"✅ Setup complete\")\n\n✅ Setup complete",
+    "crumbs": [
+      "Step 1: Setup"
+    ]
+  },
+  {
+    "objectID": "01-setup.html#whats-next",
+    "href": "01-setup.html#whats-next",
+    "title": "Step 1: Setup",
+    "section": "What’s next",
+    "text": "What’s next\nStep 2: open 02-stream.ipynb — we’ll grab one photo from the camera and save it to disk.",
+    "crumbs": [
+      "Step 1: Setup"
+    ]
+  }
+]

@@ -1,0 +1,2 @@
+[console_scripts]
+bird-watcher = bird_watcher.__main__:main

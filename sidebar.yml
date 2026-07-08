@@ -1,0 +1,13 @@
+website:
+  sidebar:
+    contents:
+      - 01-setup.ipynb
+      - 02-stream.ipynb
+      - 03-poll.ipynb
+      - 04-detect.ipynb
+      - 05-identify.ipynb
+      - 06-persist.ipynb
+      - 07-slack.ipynb
+      - 08-web-hello.ipynb
+      - 09-gallery.ipynb
+      - 10-digest.ipynb

@@ -2,11 +2,12 @@
 name = "bird-watcher"
 version = "0.0.0"
 description = "Smart bird detection system — tutorial in 10 issues"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "Pillow>=10",
     "requests>=2.32",
-    "python-dotenv",
+    "nbformat>=5.10",
+    "PyYAML>=6.0",
     "ultralytics",
     "opencv-python-headless",
     "transformers>=5.0",
@@ -20,6 +21,7 @@ dependencies = [
 dev = [
     "pytest>=7.0",
     "ruff>=0.1",
+    "nbdev>=3.0",
 ]
 
 [project.scripts]
@@ -30,7 +32,21 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["src"]
+include = ["bird_watcher*"]
+
+[tool.nbdev]
+nbs_path = "tutorials"
+library_name = "bird_watcher"
+min_python = "3.11"
+license = "apache2"
+repo = "https://github.com/jaewilson07/bird-watcher"
+doc_path = "_docs"
+doc_host = "https://jaewilson07.github.io"
+doc_baseurl = "/bird-watcher/"
+branch = "main"
+audience = "general"
+clean_ids = true
+strip_lib_paths = true
 
 [tool.ruff]
 line-length = 100
