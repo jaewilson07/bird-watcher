@@ -1,2 +1,5 @@
 [console_scripts]
 bird-watcher = bird_watcher.__main__:main
+bird-watcher-bot = bird_watcher.slack_bot:main
+bird-watcher-digest = bird_watcher.daily_summary:main
+bird-watcher-web = bird_watcher.web_app:main

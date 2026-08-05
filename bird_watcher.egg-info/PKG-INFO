@@ -5,15 +5,19 @@ Summary: Smart bird detection system — tutorial in 10 issues
 Requires-Python: >=3.11
 Requires-Dist: Pillow>=10
 Requires-Dist: requests>=2.32
+Requires-Dist: fastcore>=1.5
+Requires-Dist: python-dotenv>=1.0
 Requires-Dist: nbformat>=5.10
 Requires-Dist: PyYAML>=6.0
 Requires-Dist: ultralytics
 Requires-Dist: opencv-python-headless
 Requires-Dist: transformers>=5.0
+Requires-Dist: tensorflow>=2.16
 Requires-Dist: fastapi>=0.110
 Requires-Dist: uvicorn[standard]>=0.30
 Requires-Dist: jinja2>=3.1
 Requires-Dist: schedule>=1.2
+Requires-Dist: slack-bolt>=1.20
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: ruff>=0.1; extra == "dev"

@@ -6,15 +6,19 @@ requires-python = ">=3.11"
 dependencies = [
     "Pillow>=10",
     "requests>=2.32",
+    "fastcore>=1.5",
+    "python-dotenv>=1.0",
     "nbformat>=5.10",
     "PyYAML>=6.0",
     "ultralytics",
     "opencv-python-headless",
     "transformers>=5.0",
+    "tensorflow>=2.16",  # lesson 5: DogClassifier loads a keras model
     "fastapi>=0.110",
     "uvicorn[standard]>=0.30",
     "jinja2>=3.1",
     "schedule>=1.2",
+    "slack-bolt>=1.20",
 ]
 
 [project.optional-dependencies]
@@ -26,6 +30,9 @@ dev = [
 
 [project.scripts]
 bird-watcher = "bird_watcher.__main__:main"
+bird-watcher-web = "bird_watcher.web_app:main"
+bird-watcher-digest = "bird_watcher.daily_summary:main"
+bird-watcher-bot = "bird_watcher.slack_bot:main"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]

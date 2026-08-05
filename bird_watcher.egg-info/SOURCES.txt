@@ -5,13 +5,11 @@ bird_watcher/_modidx.py
 bird_watcher/core.py
 bird_watcher/daily_summary.py
 bird_watcher/detect.py
-bird_watcher/environment.py
-bird_watcher/find_birds.py
-bird_watcher/get_image.py
-bird_watcher/name_bird.py
-bird_watcher/save_sighting.py
+bird_watcher/identify.py
+bird_watcher/persistence.py
 bird_watcher/send_alert.py
-bird_watcher/species.py
+bird_watcher/slack_bot.py
+bird_watcher/stream.py
 bird_watcher/web_app.py
 bird_watcher.egg-info/PKG-INFO
 bird_watcher.egg-info/SOURCES.txt

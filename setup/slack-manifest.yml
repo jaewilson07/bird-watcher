@@ -1,0 +1,39 @@
+# Slack app manifest for Bird Watcher.
+#
+# Usage (first time):
+#   1. https://api.slack.com/apps -> Create New App -> From a manifest
+#   2. Pick your workspace, paste this file, create the app
+# Usage (updating an existing app):
+#   1. https://api.slack.com/apps -> your app -> App Manifest -> paste -> save
+#
+# Then, in both cases:
+#   3. (Re)install to Workspace -> choose the channel the webhook may post to
+#   4. Features -> Incoming Webhooks -> copy the URL into .env as SLACK_WEBHOOK
+#   5. OAuth & Permissions -> copy the Bot User OAuth Token (xoxb-...)
+#      into .env as SLACK_BOT_TOKEN
+#   6. Basic Information -> App-Level Tokens -> Generate Token with the
+#      connections:write scope -> copy it (xapp-...) into .env as SLACK_APP_TOKEN
+#   7. In #app-bird-watcher, type:  /invite @Bird Watcher
+#
+# All three values are SECRETS - they live in .env, never in code.
+
+display_information:
+  name: Bird Watcher
+  description: Posts backyard bird sightings, a daily digest, and identifies birds you submit.
+  background_color: "#2c6e49"
+features:
+  bot_user:
+    display_name: Bird Watcher
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - incoming-webhook   # lesson 7: post camera alerts to one channel
+      - chat:write         # lesson 11: reply to submissions
+      - files:read         # lesson 11: download submitted photos
+      - channels:history   # lesson 11: hear messages in public channels the bot joined
+settings:
+  event_subscriptions:
+    bot_events:
+      - message.channels   # tell us about channel messages (bot must be invited)
+  socket_mode_enabled: true

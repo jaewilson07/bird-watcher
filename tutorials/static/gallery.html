@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bird Watcher</title>
+  <style>
+    body    { font-family: sans-serif; margin: 2rem; background: #f4f7f4; }
+    h1      { margin-bottom: 0.25rem; }
+    button  { padding: 0.4rem 0.9rem; margin: 0 0.3rem 0.3rem 0; border-radius: 999px;
+              border: 1px solid #888; background: white; cursor: pointer; }
+    button:hover { background: #e0efe0; }
+    #gallery { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; }
+    .card    { background: white; border-radius: 8px; padding: 0.5rem;
+               box-shadow: 0 1px 4px rgba(0,0,0,0.15); width: 180px; }
+    .card img { width: 100%; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <h1>&#128038; Bird Watcher</h1>
+  <p id="status">loading&hellip;</p>
+  <div id="buttons"></div>
+  <div id="gallery"></div>
+
+  <script>
+    let currentSpecies = null;   // null = show every species
+
+    // whose gallery is this? /gallery.html?user=U0123 shows only that
+    // person's submissions. No ?user= means everything, camera included.
+    const currentUser = new URLSearchParams(location.search).get("user");
+
+    function galleryUrl(limit) {
+      let url = "/gallery?limit=" + limit;
+      if (currentSpecies) url += "&species=" + encodeURIComponent(currentSpecies);
+      if (currentUser) url += "&submitted_by=" + encodeURIComponent(currentUser);
+      return url;
+    }
+
+    async function loadGallery() {
+      const data = await (await fetch(galleryUrl(50))).json();
+
+      document.getElementById("status").textContent =
+        data.count + " sighting(s)"
+        + (currentSpecies ? " of " + currentSpecies : "")
+        + (currentUser ? " submitted by " + currentUser : "");
+
+      document.getElementById("gallery").innerHTML = data.sightings.map(s => `
+        <div class="card">
+          <img src="${s.image_url}" alt="${s.species}">
+          <b>${s.species}</b><br>
+          <small>${Math.round(s.confidence * 100)}% sure<br>${s.timestamp}<br>
+          ${s.submitted_by ? "&#128100; " + s.submitted_by : "&#128247; backyard cam"}</small>
+        </div>`).join("");
+    }
+
+    async function buildSpeciesButtons() {
+      const savedSpecies = currentSpecies;
+      currentSpecies = null;                 // ask for every species this user can see
+      const data = await (await fetch(galleryUrl(200))).json();
+      currentSpecies = savedSpecies;
+
+      const species = [...new Set(data.sightings.map(s => s.species))];
+
+      const buttonsDiv = document.getElementById("buttons");
+      for (const name of ["all birds", ...species]) {
+        const b = document.createElement("button");
+        b.textContent = name;
+        b.onclick = () => { currentSpecies = (name === "all birds") ? null : name; loadGallery(); };
+        buttonsDiv.appendChild(b);
+      }
+    }
+
+    buildSpeciesButtons();
+    loadGallery();
+  </script>
+</body>
+</html>

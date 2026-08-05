@@ -4,29 +4,23 @@
 __all__ = ['build_sighting_alert', 'send_alert_to_slack']
 
 # %% ../tutorials/07-slack.ipynb #92f252c8
-from pathlib import Path
+from .persistence import Sighting
 
-def build_sighting_alert(
-    species: str,
-    confidence: float,
-    snapshot_file: Path,
-    sighting_id: int | None = None,
-) -> dict:
+def build_sighting_alert(sighting: Sighting) -> dict:
     """Build a Slack Block Kit message payload for one sighting.
 
     Args:
-        species: the bird's name.
-        confidence: 0.0 - 1.0.
-        snapshot_file: the photo to attach.
-        sighting_id: optional database id for cross-referencing.
+        sighting: the saved Sighting to announce.
 
     Returns:
         A dict ready to be POSTed as JSON to a Slack webhook.
     """
-    confidence_pct = int(confidence * 100)
-    header_text = f":bird: New sighting — {species}"
-    if sighting_id is not None:
-        header_text += f" (#{sighting_id})"
+    confidence_pct = int(sighting.confidence * 100)
+
+    header_text = f":bird: New sighting — {sighting.species}"
+    if sighting.id is not None:
+        header_text += f" (#{sighting.id})"
+
     return {
         "blocks": [
             {
@@ -36,9 +30,9 @@ def build_sighting_alert(
             {
                 "type": "section",
                 "fields": [
-                    {"type": "mrkdwn", "text": f"*Species*\n{species}"},
+                    {"type": "mrkdwn", "text": f"*Species*\n{sighting.species}"},
                     {"type": "mrkdwn", "text": f"*Confidence*\n{confidence_pct}%"},
-                    {"type": "mrkdwn", "text": f"*Photo*\n`{snapshot_file.name}`"},
+                    {"type": "mrkdwn", "text": f"*Seen at*\n{sighting.timestamp:%I:%M %p}"},
                 ],
             },
         ]
@@ -47,13 +41,14 @@ def build_sighting_alert(
 
 # %% ../tutorials/07-slack.ipynb #a5bcff76
 import json
-import os
+
 import requests
+
 
 def send_alert_to_slack(
     payload: dict,
     webhook_url: str | None = None,
-    verbose: bool = True,
+    debug_prn: bool = False,
 ) -> bool:
     """POST a message payload to Slack. Prints locally if no webhook.
 
@@ -61,17 +56,14 @@ def send_alert_to_slack(
         payload: the dict returned by `build_sighting_alert`.
         webhook_url: the Slack incoming webhook URL. If empty, this runs in
             dry-run mode and prints the payload instead.
-        verbose: if True, print whether we sent or just previewed.
+        debug_prn: if True, print whether we sent or just previewed.
 
     Returns:
         True if the message was sent (or dry-run previewed), False if failed.
     """
-    import json
-    import requests
-
     url = webhook_url or ""
     if not url:
-        if verbose:
+        if debug_prn:
             print("[dry-run] No SLACK_WEBHOOK set. Would have sent:")
             print(json.dumps(payload, indent=2))
         return True
@@ -84,11 +76,11 @@ def send_alert_to_slack(
             timeout=10,
         )
         response.raise_for_status()
-        if verbose:
+        if debug_prn:
             print(f"Sent to Slack (status {response.status_code})")
         return True
     except requests.RequestException as exc:
-        if verbose:
+        if debug_prn:
             print(f"Slack send failed: {exc}")
         return False
 

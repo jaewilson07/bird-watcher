@@ -6,37 +6,33 @@
 from __future__ import annotations
 
 # %% auto #0
-__all__ = ['build_daily_summary', 'send_daily_summary', 'schedule_daily_summary']
+__all__ = ['build_daily_summary', 'send_daily_summary', 'schedule_daily_summary', 'main']
 
 # %% ../tutorials/10-digest.ipynb #ca54db48
 from collections import Counter
 from datetime import datetime, timedelta
-from pathlib import Path
-from .save_sighting import list_sightings_from_db
+
+from .persistence import SightingStorage
+
 
 def build_daily_summary(
-    db_file: Path,
-    snapshot_folder: Path,
+    storage: SightingStorage,
     window_hours: int = 24,
 ) -> dict:
     """Build a Slack message summarizing the last `window_hours` of sightings.
 
     Args:
-        db_file: where sightings are stored.
-        snapshot_folder: where snapshot images live (for referencing).
+        storage: any SightingStorage — the same contract the web app uses.
         window_hours: how far back to look. Default 24 (one day).
 
     Returns:
         A Slack Block Kit payload.
     """
-    from collections import Counter
-    from datetime import datetime, timedelta
-
-    cutoff = (datetime.now() - timedelta(hours=window_hours)).isoformat(timespec="seconds")
-    sightings = list_sightings_from_db(db_file, since=cutoff, limit=500, verbose=False)
+    cutoff = datetime.now() - timedelta(hours=window_hours)
+    sightings = [s for s in storage.get_sightings(limit=500) if s.timestamp >= cutoff]
 
     total = len(sightings)
-    counts = Counter(s["species"] for s in sightings)
+    counts = Counter(s.species for s in sightings)
     unique_species = len(counts)
     top_visitor = counts.most_common(1)[0] if counts else None
 
@@ -70,65 +66,86 @@ def build_daily_summary(
 
 
 # %% ../tutorials/10-digest.ipynb #6867d4c9
-from pathlib import Path
 from .send_alert import send_alert_to_slack
 
+
 def send_daily_summary(
-    db_file: Path,
-    snapshot_folder: Path,
+    storage: SightingStorage,
     window_hours: int = 24,
     webhook_url: str | None = None,
-    verbose: bool = True,
+    debug_prn: bool = False,
 ) -> bool:
     """Build and send (or dry-run) today's daily summary.
 
     Args:
-        db_file: where sightings are stored.
-        snapshot_folder: where snapshot images live.
+        storage: any SightingStorage.
         window_hours: how far back to look.
         webhook_url: optional Slack webhook URL. If omitted, this becomes a dry run.
-        verbose: if True, print a status line.
+        debug_prn: if True, print a status line.
 
     Returns:
         True if sent (or dry-run previewed), False on error.
     """
-    from bird_watcher.send_alert import send_alert_to_slack
-
-    payload = build_daily_summary(db_file, snapshot_folder, window_hours=window_hours)
-    return send_alert_to_slack(payload, webhook_url=webhook_url, verbose=verbose)
+    payload = build_daily_summary(storage, window_hours=window_hours)
+    return send_alert_to_slack(payload, webhook_url=webhook_url, debug_prn=debug_prn)
 
 
 # %% ../tutorials/10-digest.ipynb #29caa987
 import time
-from pathlib import Path
+
 import schedule
 
+
 def schedule_daily_summary(
-    db_file: Path,
-    snapshot_folder: Path,
+    storage: SightingStorage,
     run_at_hour: int = 21,
-    verbose: bool = True,
+    webhook_url: str | None = None,
+    debug_prn: bool = False,
 ) -> None:
     """Run a blocking scheduler that posts the daily summary once a day.
 
-    For learning purposes only — production code would use a real cron job.
+    For learning purposes only — production code would use a real cron job
+    calling `main` below.
 
     Args:
-        db_file: where sightings are stored.
-        snapshot_folder: where snapshot images live.
+        storage: any SightingStorage.
         run_at_hour: hour of day to send (24h format). Default 21 (9pm).
-        verbose: if True, print the next scheduled run.
+        webhook_url: optional Slack webhook URL. If omitted, every send is a dry run.
+        debug_prn: if True, print the next scheduled run.
     """
-    import time
-
-    import schedule
-
-    job = lambda: send_daily_summary(db_file, snapshot_folder, verbose=verbose)
+    job = lambda: send_daily_summary(storage, webhook_url=webhook_url, debug_prn=debug_prn)
     schedule.every().day.at(f"{run_at_hour:02d}:00").do(job)
-    if verbose:
+    if debug_prn:
         print(f"Scheduled daily summary at {run_at_hour:02d}:00 every day")
         print("Press Stop / Ctrl+C to exit")
     while True:
         schedule.run_pending()
         time.sleep(60)
 
+
+# %% ../tutorials/10-digest.ipynb #4692f3f1
+import os
+
+from .persistence import SqliteSightingStorage
+
+
+def main():
+    """Send one daily summary, then exit — the shape a real scheduler (cron) wants.
+
+    Settings come from environment variables, same as `bird-watcher-web`:
+
+        BIRDS_DB       — path to the SQLite file  (default: data/birds.db)
+        SLACK_WEBHOOK  — incoming webhook URL     (empty = dry-run, prints instead)
+        WINDOW_HOURS   — how far back to look     (default: 24)
+    """
+    storage = SqliteSightingStorage(
+        db_path=os.environ.get("BIRDS_DB", "data/birds.db"),
+        cooldown_minutes=0,  # the digest only reads; cooldown never comes into play
+    )
+
+    send_daily_summary(
+        storage,
+        window_hours=int(os.environ.get("WINDOW_HOURS", "24")),
+        webhook_url=os.environ.get("SLACK_WEBHOOK", ""),
+        debug_prn=True,
+    )
